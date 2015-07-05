@@ -1,0 +1,133 @@
+<html>
+<head>
+<script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+<script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js"></script>
+<style>
+.line{
+    position: absolute;
+    border-top: solid 1px #FF4981;
+    -moz-transform-origin:0% 0%;
+    -webkit-transform-origin:0% 0%;
+    transform-origin:0% 0%;
+    float: left;
+}
+
+.battery {
+    border: 8px solid black;
+    width: 50px;
+    height: 30px;
+    position: relative;
+    cursor:pointer;
+    z-index:200;
+}
+
+.battery:before {
+    content: "";
+    display: block;
+    position: absolute;
+    width: 10px;
+    height: 20px;
+    top: 3px;
+    left: 2px;
+    background: black;
+    box-shadow:
+       0 4px,
+       13px 0,
+       13px 4px,
+       26px 0,
+       26px 4px,
+       56px 3px;
+}
+</style>
+
+<script language="JavaScript">
+
+function DrawLine(params) {
+  var param = jQuery.extend({
+              ID: 0
+            , x1: 0
+            , y1: 0
+            , x2: 0
+            , y2: 0
+            , line_style: "solid"
+            , line_color: "#aaaaaa"
+            , line_width: "1px"
+            , parent: $("body")
+            , callback: function(){}
+  }, params);
+
+  if(param.x1 < param.x2){
+    sx = param.x1;
+    ex = param.x2;
+    sy = param.y1;
+    ey = param.y2;
+  }
+  else {
+    sx = param.x2;
+    ex = param.x1;
+    sy = param.y2;
+    ey = param.y1;
+  }
+
+  var w = Math.sqrt(Math.pow((sx - ex) ,2) + Math.pow((sy - ey) ,2));
+  var base = Math.max(sx, ex) - Math.min(sx, ex);
+  var tall = Math.max(sy, ey) - Math.min(sy, ey);
+  var aTan = Math.atan(tall / base);
+  var deg = aTan * 180 / Math.PI;
+  deg = sy > ey ? 0 - deg: deg;
+
+  var line = $("<div id=" + param.ID + "></div>")
+    .addClass("line")
+    .css({
+      "left": sx,
+      "top": sy,
+      "width": w,
+      "transform": "rotate(" + deg + "deg)",
+      "-webkit-transform": "rotate(" + deg + "deg)",
+      "border-top-style": param.line_style,
+      "border-top-color": param.line_color,
+      "border-top-width": param.line_width,
+    });
+  $(param.parent).append(line);
+}
+
+$(document).ready(function()
+{
+
+  DrawLine({
+    ID: "L2SW11P1-L2SW12P1",
+    x1: 50,
+    y1: 50,
+    x2: 100,
+    y2: 100,
+  });
+
+
+//  for(var i=0; i<=10; i++){
+//    $('#L2SW11P1-L2SW12P1').css({"left": 100 - i*10});
+//   alert();
+//  }
+
+  $('#draggable_battery').draggable({
+    stop: function(){
+            var ofs = $('#draggable_battery').offset();
+//          alert("X=" + ofs.left + ": Y=" + ofs.top);
+            // x2, y2の値をどうやってとってくるのか考える
+            // 接続先一覧を取得して、そのCSSパラメータをFORでまわしてremoveしてDrawLineする
+            $("#L2SW11P1-L2SW12P1").remove();
+            DrawLine({ ID: "L2SW11P1-L2SW12P1", x1: ofs.left, y1: ofs.top, x2: 50, y2: 50});
+    }
+  });
+});
+
+
+
+</script>
+</head>
+<body>
+
+<div id="draggable_battery" class="battery" ></div>
+
+</body>
+</html>
