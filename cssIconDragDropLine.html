@@ -1,8 +1,8 @@
 <html>
 <head>
-<script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
-<script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
-<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js"></script>
+<script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+<script src="https://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js"></script>
 <style>
 .line{
     position: absolute;
@@ -43,7 +43,58 @@
 
 <script language="JavaScript">
 
-function DrawLine(params) {
+var lines = {
+  "L2SW11P0-L2SW12P0":[
+  "L2SW11", "L2SW12"
+  ],
+  "L2SW12P0-L2SW13P0":[
+  "L2SW12", "L2SW13"
+  ]
+};
+
+var objects = {
+  "L2SW11":[
+   100,
+   100,
+   [ "L2SW11P0-L2SW12P0" ], 
+  ],
+  "L2SW12":[
+   200,
+   100,
+   [ "L2SW11P0-L2SW12P0", "L2SW12P0-L2SW13P0" ], 
+  ],
+  "L2SW13":[
+   100,
+   200,
+   [ "L2SW12P0-L2SW13P0" ], 
+  ],
+};
+
+
+function init() {
+
+  for(var obj in objects){
+    var area = $("<div id='" + obj + "'>" + obj + "</div>")
+              .addClass("battery")
+              .css({
+                "left": objects[obj][1],
+                "top": objects[obj][2],
+              });
+    $(document.body).append(area);
+  }
+
+  for(var line in lines){
+    drawLine({
+      ID: line,
+      x1: objects[lines[line][0]][0],
+      y1: objects[lines[line][0]][1],
+      x2: objects[lines[line][1]][0],
+      y2: objects[lines[line][1]][1]
+    });
+  }
+}
+
+function drawLine(params) {
   var param = jQuery.extend({
               ID: 0
             , x1: 0
@@ -94,40 +145,32 @@ function DrawLine(params) {
 
 $(document).ready(function()
 {
+  // init draw objects
+  init();
 
-  DrawLine({
-    ID: "L2SW11P1-L2SW12P1",
-    x1: 50,
-    y1: 50,
-    x2: 100,
-    y2: 100,
-  });
-
-
-//  for(var i=0; i<=10; i++){
-//    $('#L2SW11P1-L2SW12P1').css({"left": 100 - i*10});
-//   alert();
-//  }
-
-  $('#draggable_battery').draggable({
+  $('.battery').draggable({
     stop: function(){
-            var ofs = $('#draggable_battery').offset();
-//          alert("X=" + ofs.left + ": Y=" + ofs.top);
-            // x2, y2の値をどうやってとってくるのか考える
-            // 接続先一覧を取得して、そのCSSパラメータをFORでまわしてremoveしてDrawLineする
-            $("#L2SW11P1-L2SW12P1").remove();
-            DrawLine({ ID: "L2SW11P1-L2SW12P1", x1: ofs.left, y1: ofs.top, x2: 50, y2: 50});
+            var ofs = $(this).offset();
+            objects[this.id][0] = ofs.left;
+            objects[this.id][1] = ofs.top;
+
+            for  (var i=0; i < objects[this.id][2].length; ++i){
+              var objName = objects[this.id][2][i];
+              $("#"+objName).remove();
+              drawLine({ 
+                ID: objName,
+                x1: objects[lines[objName][0]][0],
+                y1: objects[lines[objName][0]][1],
+                x2: objects[lines[objName][1]][0],
+                y2: objects[lines[objName][1]][1]
+              });
+            }
     }
   });
 });
 
-
-
 </script>
 </head>
 <body>
-
-<div id="draggable_battery" class="battery" ></div>
-
 </body>
 </html>
