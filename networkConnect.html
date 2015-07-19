@@ -1,0 +1,169 @@
+<html>
+<head>
+<script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+<script src="https://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/jquery-
+
+ui.min.js"></script>
+<style>
+.line{
+    position: absolute;
+    border-top: solid 1px #FF4981;
+    -moz-transform-origin:0% 0%;
+    -webkit-transform-origin:0% 0%;
+    transform-origin:0% 0%;
+    float: left;
+}
+
+.object {
+    border: 4px solid black;
+    width: 50px;
+    height: 30px;
+    position: relative;
+    cursor:pointer;
+    z-index:200;
+    text-align: center;
+    vertical-align: middle;
+    background: #ccc;
+    font-size: 80%;
+}
+
+</style>
+
+<script language="JavaScript">
+
+var xCorrect = 25+4;
+var yCorrect = 15+4;
+
+var objects = {
+  "L2SW11":[
+   300,
+   200,
+   [ "L2SW12" ], 
+  ],
+  "L2SW12":[
+   200,
+   100,
+   [ "L2SW11", "L2SW13" ], 
+  ],
+  "L2SW13":[
+   0,
+   0,
+   [ "L2SW12" ], 
+  ],
+};
+
+function init() {
+
+  for(var objName in objects){
+    var objDiv = $("<div id='" + objName + "'>" + objName + "</div>")
+              .addClass("object")
+              .css({
+                "left": objects[objName][0],
+                "top": objects[objName][1],
+              });
+    $(document.body).append(objDiv);
+
+    for(var i=0; i < objects[objName][2].length; ++i){
+      var dstObjName = objects[objName][2][i];
+      var id = objName + dstObjName;
+      if( objName > dstObjName ){
+        id = dstObjName + objName;
+      }
+      $("#" + id).remove();
+      drawLine({
+        ID: id,
+        x1: objects[objName][0] + xCorrect,
+        y1: objects[objName][1] + yCorrect,
+        x2: objects[dstObjName][0] + xCorrect,
+        y2: objects[dstObjName][1] + yCorrect
+      });
+    }    
+  }
+}
+
+function drawLine(params) {
+  var param = jQuery.extend({
+              ID: 0
+            , x1: 0
+            , y1: 0
+            , x2: 0
+            , y2: 0
+            , line_style: "solid"
+            , line_color: "#aaaaaa"
+            , line_width: "1px"
+            , parent: $("body")
+            , callback: function(){}
+  }, params);
+
+  if(param.x1 < param.x2){
+    sx = param.x1;
+    ex = param.x2;
+    sy = param.y1;
+    ey = param.y2;
+  }
+  else {
+    sx = param.x2;
+    ex = param.x1;
+    sy = param.y2;
+    ey = param.y1;
+  }
+
+  var w = Math.sqrt(Math.pow((sx - ex) ,2) + Math.pow((sy - ey) ,2));
+  var base = Math.max(sx, ex) - Math.min(sx, ex);
+  var tall = Math.max(sy, ey) - Math.min(sy, ey);
+  var aTan = Math.atan(tall / base);
+  var deg = aTan * 180 / Math.PI;
+  deg = sy > ey ? 0 - deg: deg;
+
+  var line = $("<div id=" + param.ID + "></div>")
+    .addClass("line")
+    .css({
+      "left": sx,
+      "top": sy,
+      "width": w,
+      "transform": "rotate(" + deg + "deg)",
+      "-webkit-transform": "rotate(" + deg + "deg)",
+      "border-top-style": param.line_style,
+      "border-top-color": param.line_color,
+      "border-top-width": param.line_width,
+    });
+  $(param.parent).append(line);
+}
+
+$(document).ready(function()
+{
+  // init draw objects
+  init();
+
+  $('.object').draggable({
+    stop: function(){
+      var ofs = $(this).offset();
+      var objName = this.id;
+      objects[objName][0] = ofs.left;
+      objects[objName][1] = ofs.top;
+
+      for(var i=0; i < objects[objName][2].length; ++i){
+        var dstObjName = objects[objName][2][i];
+        var id = objName + dstObjName;
+        if( objName > dstObjName ){
+          id = dstObjName + objName;
+        }
+        $("#" + id).remove();
+        drawLine({
+          ID: id,
+          x1: objects[objName][0] + xCorrect,
+          y1: objects[objName][1] + yCorrect,
+          x2: objects[dstObjName][0] + xCorrect,
+          y2: objects[dstObjName][1] + yCorrect
+        });
+      }    
+    }
+  });
+});
+
+</script>
+</head>
+<body>
+</body>
+</html>
