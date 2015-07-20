@@ -36,21 +36,19 @@ var xCorrect = 25+4;
 var yCorrect = 15+4;
 
 var objects = {
-  "L2SW11":[
-   300,
-   200,
-   [ "L2SW12" ], 
-  ],
-  "L2SW12":[
-   200,
-   100,
-   [ "L2SW11", "L2SW13" ], 
-  ],
-  "L2SW13":[
-   0,
-   0,
-   [ "L2SW12" ], 
-  ],
+"L2SW11":[800,150,["L2SW12","L2SW17","L2SW1B"]],
+"L2SW12":[500,20,["L2SW11","L2SW13","L2SW14","L2SW15","L2SW16"]],
+"L2SW13":[600,150,["L2SW12","L2SW18","L2SW1C"]],
+"L2SW14":[450,150,["L2SW12","L2SW19","L2SW1A","L2SW1D"]],
+"L2SW15":[300,150,["L2SW12"]],
+"L2SW16":[200,150,["L2SW12"]],
+"L2SW17":[900,250,["L2SW11"]],
+"L2SW18":[600,250,["L2SW13"]],
+"L2SW19":[300,250,["L2SW14"]],
+"L2SW1A":[400,250,["L2SW14"]],
+"L2SW1B":[800,250,["L2SW11"]],
+"L2SW1C":[700,250,["L2SW13"]],
+"L2SW1D":[500,250,["L2SW14"]]
 };
 
 function init() {
@@ -131,6 +129,12 @@ function drawLine(params) {
   $(param.parent).append(line);
 }
 
+function dispJson() {
+  alert(JSON.stringify(objects));
+}
+
+
+
 $(document).ready(function()
 {
   // init draw objects
@@ -165,5 +169,6 @@ $(document).ready(function()
 </script>
 </head>
 <body>
+<input type="button" value="disp objects at json" onClick="dispJson()">
 </body>
 </html>
